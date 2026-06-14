@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EasyTask — 비즈니스 모델 캔버스</title>
+<style>
+/* ══════════════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* 영역 가이드 색상 (이미지 기준 정밀 추출) */
+  --orange:      #E8873A;   /* 주황 ■ 블록 8·7·6 */
+  --orange-bg:   #FEF3E8;
+  --orange-bd:   #F5C49A;
+  --orange-bar:  #E8873A;
+
+  --navy:        #1E3561;   /* 네이비 ■ 블록 2 */
+  --navy-bg:     #EEF1F7;
+  --navy-bd:     #8FA7CC;
+  --navy-bar:    #1E3561;
+
+  --red:         #C0392B;   /* 빨강 ■ 블록 4·3·1 */
+  --red-bg:      #FDECEA;
+  --red-bd:      #E8A8A0;
+  --red-bar:     #C0392B;
+
+  --green:       #2D7A5A;   /* 초록 ■ 블록 9·5 */
+  --green-bg:    #EAF5EF;
+  --green-bd:    #85C4A4;
+  --green-bar:   #2D7A5A;
+
+  /* UI 기본 */
+  --bg:          #ECEEF2;
+  --white:       #FFFFFF;
+  --ink:         #1A1A2E;
+  --ink2:        #444460;
+  --muted:       #9494AA;
+  --border:      #D8D8E4;
+
+  --radius:      10px;
+  --gap:         10px;
+  --shadow:      0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-hover:0 6px 20px rgba(0,0,0,0.13);
+}
+
+html, body {
+  font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* ══════════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════════ */
+.header {
+  background: var(--white);
+  border-bottom: 1.5px solid var(--border);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.header-brand {
+  display: flex;
+  flex-direction: column;
+}
+.header-brand strong {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--navy);
+  letter-spacing: -0.3px;
+}
+.header-brand span {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* 영역 범례 */
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #F4F4F8;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 11px;
+  color: var(--ink2);
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.legend-sq {
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  border-radius: 7px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: 0.18s;
+}
+.btn-ai    { background: var(--navy); color: #fff; }
+.btn-ai:hover { background: #162a50; }
+.btn-reset { background: #F0F0F5; color: var(--ink2); border: 1px solid var(--border); }
+.btn-reset:hover { background: #E4E4EC; }
+
+/* ══════════════════════════════════════════════
+   MAIN LAYOUT
+══════════════════════════════════════════════ */
+.main {
+  padding: 18px 16px 48px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* 상단 5열 그리드 */
+.grid-top {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr 1.6fr 1fr 1fr;
+  gap: var(--gap);
+  align-items: stretch;
+}
+
+/* 가운데 2단 스택 (7+6) */
+.col-mid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+/* 우측 2단 스택 (4+3) */
+.col-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+/* 하단 2열 */
+.grid-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+  margin-top: var(--gap);
+}
+
+/* ══════════════════════════════════════════════
+   BLOCK CARD — 이미지 스타일 정밀 복원
+══════════════════════════════════════════════ */
+.block {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+  min-height: 220px;
+}
+.block:hover { box-shadow: var(--shadow-hover); }
+
+/* 색상 변형 */
+.block-orange { background: var(--orange-bg); border: 1.5px solid var(--orange-bd); border-left: 4px solid var(--orange-bar); }
+.block-navy   { background: var(--navy-bg);   border: 1.5px solid var(--navy-bd);   border-left: 4px solid var(--navy-bar);  }
+.block-red    { background: var(--red-bg);    border: 1.5px solid var(--red-bd);    border-left: 4px solid var(--red-bar);   }
+.block-green  { background: var(--green-bg);  border: 1.5px solid var(--green-bd);  border-left: 4px solid var(--green-bar); }
+
+/* ── 블록 헤더 ── */
+.block-head {
+  padding: 11px 13px 8px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  flex-shrink: 0;
+}
+
+.block-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* 영역 가이드 색상 사각 ■ */
+.area-sq {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  display: inline-block;
+}
+.sq-orange { background: var(--orange); }
+.sq-navy   { background: var(--navy); }
+.sq-red    { background: var(--red); }
+.sq-green  { background: var(--green); }
+
+.block-num-name {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+.block-num {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.2px;
+}
+.block-name-kr {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.3px;
+}
+.block-name-en {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 2px;
+}
+
+.btn-add-item {
+  background: rgba(255,255,255,0.7);
+  border: 1.5px dashed rgba(0,0,0,0.18);
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 15px;
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: 0.18s;
+  line-height: 1;
+}
+.btn-add-item:hover { background: white; color: var(--orange); border-color: var(--orange); }
+
+/* ── 인라인 추가 폼 ── */
+.inline-form {
+  display: none;
+  padding: 6px 12px 0;
+  gap: 5px;
+}
+.inline-form.open { display: flex; }
+.inline-form input {
+  flex: 1;
+  border: 1.5px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-family: inherit;
+  background: rgba(255,255,255,0.85);
+  color: var(--ink);
+  outline: none;
+}
+.inline-form input:focus { border-color: var(--navy); }
+.inline-form .btn-confirm {
+  background: var(--navy);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 11px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+/* ── 블록 바디 ── */
+.block-body {
+  padding: 8px 12px 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ── 아이템 ── */
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 5px 7px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(0,0,0,0.05);
+  transition: background 0.15s;
+}
+.item:last-child { margin-bottom: 0; }
+.item:hover { background: rgba(255,255,255,0.9); }
+
+.item-bullet {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+.block-orange .item-bullet { background: var(--orange); }
+.block-navy   .item-bullet { background: var(--navy); }
+.block-red    .item-bullet { background: var(--red); }
+.block-green  .item-bullet { background: var(--green); }
+
+.item-text {
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink2);
+  word-break: keep-all;
+  outline: none;
+  cursor: text;
+}
+.item-text:focus {
+  background: rgba(255,255,255,0.95);
+  border-radius: 4px;
+  padding: 0 3px;
+}
+
+.item-del {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: transparent;
+  font-size: 13px;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: color 0.15s;
+}
+.item:hover .item-del { color: #ccc; }
+.item-del:hover { color: var(--red) !important; }
+
+/* ══════════════════════════════════════════════
+   AI 사이드패널
+══════════════════════════════════════════════ */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.28);
+  z-index: 200;
+  backdrop-filter: blur(2px);
+}
+.overlay.on { display: block; }
+
+.ai-panel {
+  position: fixed;
+  right: 0; top: 0; bottom: 0;
+  width: 400px;
+  background: var(--white);
+  box-shadow: -4px 0 32px rgba(0,0,0,0.15);
+  z-index: 210;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(102%);
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+}
+.ai-panel.on { transform: translateX(0); }
+
+.ai-panel-head {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ai-panel-head h2 { font-size: 15px; font-weight: 800; color: var(--navy); }
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--muted);
+  cursor: pointer;
+  line-height: 1;
+}
+.btn-close:hover { color: var(--red); }
+
+.ai-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink2);
+  margin-bottom: 5px;
+  letter-spacing: 0.2px;
+}
+
+.ai-select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--ink);
+  background: white;
+  outline: none;
+}
+.ai-select:focus { border-color: var(--navy); }
+
+.ai-textarea {
+  width: 100%;
+  height: 80px;
+  padding: 9px 11px;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--ink);
+  resize: vertical;
+  outline: none;
+  line-height: 1.6;
+}
+.ai-textarea:focus { border-color: var(--navy); }
+
+.btn-run {
+  width: 100%;
+  background: var(--navy);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.18s;
+  letter-spacing: 0.3px;
+}
+.btn-run:hover:not(:disabled) { background: #162a50; }
+.btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.divider { height: 1px; background: var(--border); }
+
+.result-box {
+  display: none;
+  background: #F7F8FC;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  padding: 12px 14px;
+}
+.result-box.on { display: block; }
+.result-title {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.suggest-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #EDEDF2;
+}
+.suggest-row:last-child { border-bottom: none; }
+.suggest-text { font-size: 12px; color: var(--ink2); flex: 1; line-height: 1.55; }
+.btn-pick {
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 3px 9px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: 0.15s;
+}
+.btn-pick:hover { background: #226648; }
+.btn-pick:disabled { background: #aaa; cursor: default; }
+
+.ai-thinking {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  padding: 20px 0;
+  font-style: italic;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+/* ══════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════ */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: var(--ink);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 9px 20px;
+  border-radius: 30px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.22);
+  transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+  z-index: 300;
+  white-space: nowrap;
+}
+.toast.on { transform: translateX(-50%) translateY(0); }
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media (max-width: 1200px) {
+  .grid-top { grid-template-columns: 1fr 1fr 1.4fr 1fr; }
+}
+@media (max-width: 900px) {
+  .grid-top { grid-template-columns: 1fr 1fr; }
+  .ai-panel { width: 100%; }
+  .legend { display: none; }
+}
+@media (max-width: 520px) {
+  .grid-top, .grid-bottom { grid-template-columns: 1fr; }
+  .main { padding: 12px 10px 40px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Overlay & AI Panel ── -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+
+<aside class="ai-panel" id="ai-panel">
+  <div class="ai-panel-head">
+    <h2>✦ AI 항목 제안</h2>
+    <button class="btn-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="ai-panel-body">
+    <div>
+      <div class="field-label">블록 선택</div>
+      <select class="ai-select" id="ai-select">
+        <option value="1">■ 1. 고객 세그먼트 (Customer Segments)</option>
+        <option value="2">■ 2. 가치 제안 (Value Propositions)</option>
+        <option value="3">■ 3. 채널 (Channels)</option>
+        <option value="4">■ 4. 고객 관계 (Customer Relationships)</option>
+        <option value="5">■ 5. 수익원 (Revenue Streams)</option>
+        <option value="6">■ 6. 핵심 자원 (Key Resources)</option>
+        <option value="7">■ 7. 핵심 활동 (Key Activities)</option>
+        <option value="8">■ 8. 핵심 파트너십 (Key Partners)</option>
+        <option value="9">■ 9. 비용 구조 (Cost Structure)</option>
+      </select>
+    </div>
+    <div>
+      <div class="field-label">추가 요청 사항 (선택)</div>
+      <textarea class="ai-textarea" id="ai-extra"
+        placeholder="예: 이루미 자동화와 연계된 항목 위주&#10;예: 린스타트업 1단계 CPF 관점으로&#10;예: 경쟁사 대비 차별화 포인트 중심"></textarea>
+    </div>
+    <button class="btn-run" id="btn-run" onclick="runAI()">✦ AI 제안 받기</button>
+    <div class="divider"></div>
+    <div class="result-box" id="result-box">
+      <div class="result-title">제안 항목 — 클릭하여 블록에 추가</div>
+      <div id="suggestions"></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── Toast ── -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════════ -->
+<header class="header">
+  <div class="header-brand">
+    <strong>비즈니스 모델 캔버스 (BMC 9-Block)</strong>
+    <span>EasyTask Partner TF · 채용공고 대행 &amp; 면접일정 관리 서비스 · 2026.06</span>
+  </div>
+  <div class="header-right">
+    <!-- 영역 가이드 범례 -->
+    <div class="legend">
+      <div class="legend-item"><span class="legend-sq" style="background:var(--orange)"></span>공급(내부)</div>
+      <div class="legend-item"><span class="legend-sq" style="background:var(--navy)"></span>가치 제안</div>
+      <div class="legend-item"><span class="legend-sq" style="background:var(--red)"></span>고객(외부)</div>
+      <div class="legend-item"><span class="legend-sq" style="background:var(--green)"></span>재무</div>
+    </div>
+    <button class="btn btn-reset" onclick="resetData()">↺ 초기화</button>
+    <button class="btn btn-ai" onclick="openPanel()">✦ AI 항목 제안</button>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════
+     BMC CANVAS
+══════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- 상단 5컬럼 영역 -->
+  <div class="grid-top">
+
+    <!-- ■ 8. 핵심 파트너십 -->
+    <div class="block block-orange" id="block-8">
+      <div class="block-head">
+        <div class="block-title-row">
+          <span class="area-sq sq-orange"></span>
+          <span class="block-num">8.</span>
+          <span class="block-name-kr">핵심 파트너십</span>
+          <span class="block-name-en">Key Partners</span>
+        </div>
+        <button class="btn-add-item" onclick="toggleForm('8')" title="항목 추가">+</button>
+      </div>
+      <div class="inline-form" id="form-8">
+        <input type="text" id="inp-8" placeholder="파트너 입력…"
+          onkeydown="onKey(event,'8')">
+        <button class="btn-confirm" onclick="addItem('8')">추가</button>
+      </div>
+      <div class="block-body" id="body-8"></div>
+    </div>
+
+    <!-- 가운데 스택: 7 + 6 -->
+    <div class="col-mid">
+      <!-- ■ 7. 핵심 활동 -->
+      <div class="block block-orange" id="block-7" style="min-height:160px;flex:1">
+        <div class="block-head">
+          <div class="block-title-row">
+            <span class="area-sq sq-orange"></span>
+            <span class="block-num">7.</span>
+            <span class="block-name-kr">핵심 활동</span>
+            <span class="block-name-en">Key Activities</span>
+          </div>
+          <button class="btn-add-item" onclick="toggleForm('7')">+</button>
+        </div>
+        <div class="inline-form" id="form-7">
+          <input type="text" id="inp-7" placeholder="활동 입력…" onkeydown="onKey(event,'7')">
+          <button class="btn-confirm" onclick="addItem('7')">추가</button>
+        </div>
+        <div class="block-body" id="body-7"></div>
+      </div>
+      <!-- ■ 6. 핵심 자원 -->
+      <div class="block block-orange" id="block-6" style="min-height:160px;flex:1">
+        <div class="block-head">
+          <div class="block-title-row">
+            <span class="area-sq sq-orange"></span>
+            <span class="block-num">6.</span>
+            <span class="block-name-kr">핵심 자원</span>
+            <span class="block-name-en">Key Resources</span>
+          </div>
+          <button class="btn-add-item" onclick="toggleForm('6')">+</button>
+        </div>
+        <div class="inline-form" id="form-6">
+          <input type="text" id="inp-6" placeholder="자원 입력…" onkeydown="onKey(event,'6')">
+          <button class="btn-confirm" onclick="addItem('6')">추가</button>
+        </div>
+        <div class="block-body" id="body-6"></div>
+      </div>
+    </div>
+
+    <!-- ■ 2. 가치 제안 (CENTER — Navy) -->
+    <div class="block block-navy" id="block-2">
+      <div class="block-head">
+        <div class="block-title-row">
+          <span class="area-sq sq-navy"></span>
+          <span class="block-num">2.</span>
+          <span class="block-name-kr">가치 제안</span>
+          <span class="block-name-en">Value Propositions</span>
+        </div>
+        <button class="btn-add-item" onclick="toggleForm('2')" style="border-color:rgba(30,53,97,0.25);color:var(--navy)">+</button>
+      </div>
+      <div class="inline-form" id="form-2">
+        <input type="text" id="inp-2" placeholder="가치 제안 입력…" onkeydown="onKey(event,'2')">
+        <button class="btn-confirm" onclick="addItem('2')">추가</button>
+      </div>
+      <div class="block-body" id="body-2"></div>
+    </div>
+
+    <!-- 우측 스택: 4 + 3 -->
+    <div class="col-right">
+      <!-- ■ 4. 고객 관계 -->
+      <div class="block block-red" id="block-4" style="min-height:160px;flex:1">
+        <div class="block-head">
+          <div class="block-title-row">
+            <span class="area-sq sq-red"></span>
+            <span class="block-num">4.</span>
+            <span class="block-name-kr">고객 관계</span>
+            <span class="block-name-en">Customer Relationships</span>
+          </div>
+          <button class="btn-add-item" onclick="toggleForm('4')">+</button>
+        </div>
+        <div class="inline-form" id="form-4">
+          <input type="text" id="inp-4" placeholder="관계 입력…" onkeydown="onKey(event,'4')">
+          <button class="btn-confirm" onclick="addItem('4')">추가</button>
+        </div>
+        <div class="block-body" id="body-4"></div>
+      </div>
+      <!-- ■ 3. 채널 -->
+      <div class="block block-red" id="block-3" style="min-height:160px;flex:1">
+        <div class="block-head">
+          <div class="block-title-row">
+            <span class="area-sq sq-red"></span>
+            <span class="block-num">3.</span>
+            <span class="block-name-kr">채널</span>
+            <span class="block-name-en">Channels</span>
+          </div>
+          <button class="btn-add-item" onclick="toggleForm('3')">+</button>
+        </div>
+        <div class="inline-form" id="form-3">
+          <input type="text" id="inp-3" placeholder="채널 입력…" onkeydown="onKey(event,'3')">
+          <button class="btn-confirm" onclick="addItem('3')">추가</button>
+        </div>
+        <div class="block-body" id="body-3"></div>
+      </div>
+    </div>
+
+    <!-- ■ 1. 고객 세그먼트 -->
+    <div class="block block-red" id="block-1">
+      <div class="block-head">
+        <div class="block-title-row">
+          <span class="area-sq sq-red"></span>
+          <span class="block-num">1.</span>
+          <span class="block-name-kr">고객 세그먼트</span>
+          <span class="block-name-en">Customer Segments</span>
+        </div>
+        <button class="btn-add-item" onclick="toggleForm('1')">+</button>
+      </div>
+      <div class="inline-form" id="form-1">
+        <input type="text" id="inp-1" placeholder="고객 세그먼트 입력…" onkeydown="onKey(event,'1')">
+        <button class="btn-confirm" onclick="addItem('1')">추가</button>
+      </div>
+      <div class="block-body" id="body-1"></div>
+    </div>
+
+  </div><!-- /grid-top -->
+
+  <!-- 하단 2컬럼 -->
+  <div class="grid-bottom">
+    <!-- ■ 9. 비용 구조 -->
+    <div class="block block-green" id="block-9" style="min-height:150px;">
+      <div class="block-head">
+        <div class="block-title-row">
+          <span class="area-sq sq-green"></span>
+          <span class="block-num">9.</span>
+          <span class="block-name-kr">비용 구조</span>
+          <span class="block-name-en">Cost Structure</span>
+        </div>
+        <button class="btn-add-item" onclick="toggleForm('9')">+</button>
+      </div>
+      <div class="inline-form" id="form-9">
+        <input type="text" id="inp-9" placeholder="비용 항목 입력…" onkeydown="onKey(event,'9')">
+        <button class="btn-confirm" onclick="addItem('9')">추가</button>
+      </div>
+      <div class="block-body" id="body-9"></div>
+    </div>
+    <!-- ■ 5. 수익원 -->
+    <div class="block block-green" id="block-5" style="min-height:150px;">
+      <div class="block-head">
+        <div class="block-title-row">
+          <span class="area-sq sq-green"></span>
+          <span class="block-num">5.</span>
+          <span class="block-name-kr">수익원</span>
+          <span class="block-name-en">Revenue Streams</span>
+        </div>
+        <button class="btn-add-item" onclick="toggleForm('5')">+</button>
+      </div>
+      <div class="inline-form" id="form-5">
+        <input type="text" id="inp-5" placeholder="수익원 입력…" onkeydown="onKey(event,'5')">
+        <button class="btn-confirm" onclick="addItem('5')">추가</button>
+      </div>
+      <div class="block-body" id="body-5"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════ -->
+<script>
+/* ─────────────────────────────────────────────
+   초기 데이터 — 의견서 기반 BMC 9블록 콘텐츠
+   (localStorage에 없을 때만 사용)
+───────────────────────────────────────────── */
+const DEFAULT_DATA = {
+  '1': [
+    '채용 행정 여력이 없는 1인 기업 대표자',
+    '초기 팀 운영 중인 소규모 스타트업',
+    '알바·파트타임 채용이 필요한 소상공인',
+    '부동산·전문직 사무소 (업종 특화 채용)',
+    '인사 담당자 없는 소규모 법인 (5~20인)',
+  ],
+  '2': [
+    '채용공고를 대신 작성·등록 (잡코리아·사람인·알바몬 등 2곳 + 이지태스크 자사 채널)',
+    '지원자 현황 자동 정리 및 적합 후보 선별 보고',
+    '후보자 면접 가능 일정 조율 및 확정 공유',
+    '노쇼 방지 사전 리마인더 자동 연락 처리',
+    '채용 진행 현황 보고서·면접 일정표 납품',
+    '이루미 자동화 연동 — 수작업 없는 운영 효율화',
+  ],
+  '3': [
+    '이지태스크 공식 홈페이지 채용 게시판 (자사 채널)',
+    '소상공인 협회·소규모 사업체 네트워크 제휴',
+    '네이버 카페·커뮤니티 콘텐츠 마케팅',
+    '이루미 기존 고객 대상 교차 판매(Cross-sell)',
+    '고객 추천·입소문 (1개월 무료 체험 트리거)',
+  ],
+  '4': [
+    '1개월 무료 파일럿 → 유료 자연 전환 온보딩',
+    '채용 진행 현황 실시간 공유 리포트 발송',
+    '담당 매니저 1:1 카카오톡·이메일 대응',
+    'VIP 정기구독 고객 우선 처리 & 전담 케어',
+    '3개월 재계약 시 1개월 50% 할인 리텐션 인센티브',
+  ],
+  '5': [
+    '시간 단위 실비 정산 — 16,500원/시간 (VAT 포함)',
+    '도입 패키지 — 월 83,000원 (공고 3건 기준)',
+    '정기 구독 — 월 100,000원 (인력 충원 시까지 지속 대행)',
+    '채용 확정 성공 보수 — 건당 30,000원 (도입 검토 중)',
+    '이루미 자동화 솔루션 번들 업셀링',
+  ],
+  '6': [
+    '채용 대행 전담 운영 매니저 (인적 자원)',
+    '이지태스크 이루미 자동화 인프라 (기술 자원)',
+    '이지태스크 공식 구인 채널 자사 홈페이지',
+    '지원자 DB·CRM 관리 시스템 (데이터 자원)',
+    'SOP 표준 운영 절차 매뉴얼 (지식 자원)',
+    '개인정보 처리 방침 및 보안 체계 (법적 자원)',
+  ],
+  '7': [
+    '고객사 채용 요건 확인 및 공고 작성·등록',
+    '지원자 모집 현황 파악 및 후보 분류·선별',
+    '후보자 면접 가능 일정 조율 및 조정',
+    '노쇼 방지 리마인더 연락 (이루미 자동화 연동)',
+    '면접 확정 일정 고객사 실시간 공유 및 변경 대응',
+    '채용 현황 보고서 작성 및 납품',
+  ],
+  '8': [
+    '잡코리아·사람인·알바몬 등 구인사이트',
+    '소상공인 협회 & 스타트업 커뮤니티 네트워크',
+    '이루미 개발·운영팀 (자동화 기술 파트너)',
+    '개인정보보호·법률 자문 (컴플라이언스 파트너)',
+    '부동산 브랜딩 서비스팀 (이지태스크 내 시너지)',
+  ],
+  '9': [
+    '채용 대행 매니저 인건비 (고정비 — 주요 비용)',
+    '이루미 자동화 인프라 운영·유지보수 비용',
+    '콘텐츠 수집·편집 인프라 유지 비용',
+    '마케팅·콘텐츠 제작 초기 투자 비용',
+    '개인정보보호 시스템·법률 컨설팅 비용',
+    '자사 채용 채널 구축 및 유지 비용',
+  ],
+};
+
+/* 블록 메타 */
+const BLOCK_META = {
+  '1': { kr:'고객 세그먼트',  en:'Customer Segments' },
+  '2': { kr:'가치 제안',      en:'Value Propositions' },
+  '3': { kr:'채널',           en:'Channels' },
+  '4': { kr:'고객 관계',      en:'Customer Relationships' },
+  '5': { kr:'수익원',         en:'Revenue Streams' },
+  '6': { kr:'핵심 자원',      en:'Key Resources' },
+  '7': { kr:'핵심 활동',      en:'Key Activities' },
+  '8': { kr:'핵심 파트너십',  en:'Key Partners' },
+  '9': { kr:'비용 구조',      en:'Cost Structure' },
+};
+
+const STORAGE_KEY = 'bmc_easytask_v3';
+
+/* ─────────────────────────────────────────────
+   STATE
+───────────────────────────────────────────── */
+let state = {};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    state = raw ? JSON.parse(raw) : deepCopy(DEFAULT_DATA);
+  } catch(e) {
+    state = deepCopy(DEFAULT_DATA);
+  }
+}
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function deepCopy(o) { return JSON.parse(JSON.stringify(o)); }
+
+/* ─────────────────────────────────────────────
+   RENDER
+───────────────────────────────────────────── */
+function renderAll() {
+  Object.keys(state).forEach(id => renderBlock(id));
+}
+
+function renderBlock(id) {
+  const body = document.getElementById('body-' + id);
+  if (!body) return;
+  const items = state[id] || [];
+  body.innerHTML = items.length === 0
+    ? `<p style="font-size:11px;color:var(--muted);padding:4px 0;font-style:italic;">+ 버튼으로 항목을 추가하세요</p>`
+    : items.map((txt, i) => `
+        <div class="item" data-id="${id}" data-i="${i}">
+          <span class="item-bullet"></span>
+          <span class="item-text"
+            contenteditable="true"
+            spellcheck="false"
+            onblur="onEditBlur(event,'${id}',${i})"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"
+          >${esc(txt)}</span>
+          <button class="item-del" onclick="delItem('${id}',${i})" title="삭제">✕</button>
+        </div>
+      `).join('');
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ─────────────────────────────────────────────
+   ITEM CRUD
+───────────────────────────────────────────── */
+function addItem(id) {
+  const inp = document.getElementById('inp-' + id);
+  const txt = inp.value.trim();
+  if (!txt) { inp.focus(); return; }
+  if (!state[id]) state[id] = [];
+  state[id].push(txt);
+  inp.value = '';
+  saveState();
+  renderBlock(id);
+  toast('항목이 추가되었습니다 ✓');
+}
+
+function delItem(id, i) {
+  state[id].splice(i, 1);
+  saveState();
+  renderBlock(id);
+  toast('항목이 삭제되었습니다');
+}
+
+function onEditBlur(e, id, i) {
+  const txt = e.target.innerText.trim();
+  if (!txt) { delItem(id, i); return; }
+  state[id][i] = txt;
+  saveState();
+}
+
+function toggleForm(id) {
+  document.querySelectorAll('.inline-form').forEach(f => {
+    if (f.id !== 'form-' + id) f.classList.remove('open');
+  });
+  const form = document.getElementById('form-' + id);
+  const opening = !form.classList.contains('open');
+  form.classList.toggle('open', opening);
+  if (opening) document.getElementById('inp-' + id).focus();
+}
+
+function onKey(e, id) {
+  if (e.key === 'Enter')  { e.preventDefault(); addItem(id); }
+  if (e.key === 'Escape') { document.getElementById('form-'+id).classList.remove('open'); }
+}
+
+/* ─────────────────────────────────────────────
+   RESET
+───────────────────────────────────────────── */
+function resetData() {
+  if (!confirm('모든 항목을 초기 데이터로 되돌리겠습니까?')) return;
+  state = deepCopy(DEFAULT_DATA);
+  saveState();
+  renderAll();
+  toast('초기 데이터로 복원되었습니다 ↺');
+}
+
+/* ─────────────────────────────────────────────
+   AI PANEL
+───────────────────────────────────────────── */
+let aiCache = null;
+
+function openPanel()  {
+  document.getElementById('ai-panel').classList.add('on');
+  document.getElementById('overlay').classList.add('on');
+}
+function closePanel() {
+  document.getElementById('ai-panel').classList.remove('on');
+  document.getElementById('overlay').classList.remove('on');
+}
+
+async function runAI() {
+  const bid   = document.getElementById('ai-select').value;
+  const extra = document.getElementById('ai-extra').value.trim();
+  const btn   = document.getElementById('btn-run');
+  const rbox  = document.getElementById('result-box');
+  const sdiv  = document.getElementById('suggestions');
+
+  const meta    = BLOCK_META[bid];
+  const existing = (state[bid] || []).join('\n• ');
+
+  const system = `당신은 비즈니스 모델 캔버스(BMC) 전문 컨설턴트입니다.
+[사업 컨텍스트]
+• 회사: EasyTask (이지태스크)
+• 서비스: 채용공고 대행 및 면접일정 관리 서비스
+• 타겟: 1인 기업, 소규모 스타트업, 소상공인
+• 핵심 특징: 이루미 자동화 인프라, 린스타트업 단계적 검증, 시간 단위 실비 정산(16,500원/시간, VAT포함), 월정액 구독(100,000원)
+• 검증 단계: CPF → PSF → SPF → PMF → GTM`;
+
+  const user = `BMC의 "${meta.kr} (${meta.en})" 블록에 추가할 새로운 항목 4개를 제안해 주세요.
+
+현재 이 블록 항목:
+• ${existing || '(없음)'}
+
+${extra ? `추가 요청: ${extra}` : ''}
+
+출력 규칙:
+1. 기존 항목과 중복되지 않는 새로운 항목만
+2. 각 항목은 실무 현장에서 즉시 사용 가능한 15~40자 한국어
+3. 아래 JSON 형식만 출력 (다른 텍스트 일절 없이):
+["항목1","항목2","항목3","항목4"]`;
+
+  btn.disabled = true;
+  btn.textContent = '⏳ AI 분석 중…';
+  rbox.classList.add('on');
+  sdiv.innerHTML = '<p class="ai-thinking">AI가 사업 맥락을 분석하고 있습니다…</p>';
+
+  try {
+    const res  = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system,
+        messages: [{ role: 'user', content: user }],
+      }),
+    });
+    const data  = await res.json();
+    const raw   = (data.content || []).map(c => c.text || '').join('');
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const items = JSON.parse(clean);
+    if (!Array.isArray(items) || !items.length) throw new Error('빈 응답');
+
+    aiCache = { bid, items };
+    sdiv.innerHTML = items.map((txt, i) => `
+      <div class="suggest-row">
+        <span class="suggest-text">${esc(txt)}</span>
+        <button class="btn-pick" id="pick-${i}" onclick="pickItem(${i})">+ 추가</button>
+      </div>`).join('');
+
+  } catch(err) {
+    sdiv.innerHTML = `<p style="font-size:12px;color:var(--red);padding:8px 0">
+      오류: ${err.message}<br><small>잠시 후 다시 시도해 주세요.</small></p>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✦ AI 제안 받기';
+}
+
+function pickItem(i) {
+  if (!aiCache) return;
+  const { bid, items } = aiCache;
+  const txt = items[i];
+  if (!txt) return;
+  if ((state[bid] || []).includes(txt)) { toast('이미 있는 항목입니다'); return; }
+  if (!state[bid]) state[bid] = [];
+  state[bid].push(txt);
+  saveState();
+  renderBlock(bid);
+  const btn = document.getElementById('pick-' + i);
+  if (btn) { btn.textContent = '✓ 완료'; btn.disabled = true; btn.style.background = 'var(--green)'; }
+  toast(`"${BLOCK_META[bid].kr}" 블록에 추가되었습니다 ✓`);
+}
+
+/* ─────────────────────────────────────────────
+   TOAST
+───────────────────────────────────────────── */
+let _tt;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('on');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('on'), 2200);
+}
+
+/* ─────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────── */
+loadState();
+renderAll();
+</script>
+</body>
+</html>
