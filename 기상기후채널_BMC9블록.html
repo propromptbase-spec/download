@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>기상기후 행정 채널 BMC 9블록</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 20px;
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    background: #fff;
+  }
+  .sheet { width: 1160px; margin: 0 auto; }
+
+  .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 10px; }
+  .header h1 { font-size: 21px; margin: 0 0 2px 0; color:#1a1a1a; }
+  .header .sub { font-size: 12px; color:#555; }
+
+  .legend { text-align:right; font-size: 11px; }
+  .legend div { display:flex; align-items:center; justify-content:flex-end; gap:6px; margin-bottom:3px; }
+  .legend .sw { width:14px; height:14px; border-radius:2px; display:inline-block; }
+
+  .canvas-wrap { position: relative; width: 100%; }
+
+  .top-region {
+    position: relative;
+    display:grid;
+    grid-template-columns: 1fr 1fr 2fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 8px;
+    height: 470px;
+    padding: 10px;
+    border-radius: 10px;
+    overflow:hidden;
+  }
+  .top-region::before {
+    content:"";
+    position:absolute; left:0; top:0; width:50%; height:100%;
+    background:#fbe9a0; z-index:0;
+  }
+  .top-region::after {
+    content:"";
+    position:absolute; right:0; top:0; width:50%; height:100%;
+    background:#f7c9bd; z-index:0;
+  }
+
+  .card {
+    position:relative; z-index:1;
+    background: transparent;
+    border: 2px solid;
+    border-radius: 8px;
+    padding: 9px 12px;
+    display:flex; flex-direction:column;
+    overflow:hidden;
+  }
+  .card h2 {
+    margin: 0 0 6px 0;
+    font-size: 14.5px;
+    font-weight:700;
+    display:flex; align-items:center; gap:6px;
+  }
+  .card h2 .num {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:18px; height:18px; border-radius:4px;
+    color:#fff; font-size:11px; font-weight:700;
+  }
+  .card ul { margin:0; padding-left: 15px; flex:1; }
+  .card ul li { font-size: 13.3px; line-height: 1.42; margin-bottom: 2px; }
+
+  /* cost/gold family */
+  .partners, .activities, .resources { border-color:#c9971f; }
+  .partners h2, .activities h2, .resources h2 { color:#8a6408; }
+  .partners .num, .activities .num, .resources .num { background:#c9971f; }
+
+  /* revenue/salmon family */
+  .relations, .channels, .segments { border-color:#c0453a; }
+  .relations h2, .channels h2, .segments h2 { color:#8f2c24; }
+  .relations .num, .channels .num, .segments .num { background:#c0453a; }
+
+  .partners { grid-column:1; grid-row:1/3; }
+  .activities { grid-column:2; grid-row:1; }
+  .resources { grid-column:2; grid-row:2; }
+  .segments { grid-column:5; grid-row:1/3; }
+  .relations { grid-column:4; grid-row:1; }
+  .channels { grid-column:4; grid-row:2; }
+
+  .value-prop {
+    grid-column:3; grid-row:1/3;
+    border: 2px solid #1f3a6e;
+    position:relative;
+  }
+  .value-prop h2 { color:#1f3a6e; }
+  .value-prop .num { background:#1f3a6e; }
+  .value-prop::before {
+    content:"";
+    position:absolute; left:50%; top:8px; bottom:8px; width:1.5px;
+    background:#1f3a6e; opacity:0.55;
+  }
+
+  .bottom-region {
+    position: relative;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    height: 200px;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    background:#c9e8cf;
+  }
+  .bottom-region .card { border-color:#2f8a4c; }
+  .bottom-region .card h2 { color:#1f6636; }
+  .bottom-region .card .num { background:#2f8a4c; }
+  .bottom-region .card ul li { font-size: 15.3px; line-height: 1.55; }
+  .bottom-region .card h2 { font-size: 16.3px; }
+
+  .footer { margin-top: 8px; font-size: 10px; color:#888; }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="header">
+    <div>
+      <h1>기상·기후 행정 전문 채널 &quot;날씨경영 파트너&quot; — 비즈니스 모델 캔버스</h1>
+      <div class="sub">Business Model Canvas · 9 Block · 담당자: 김영신</div>
+    </div>
+    <div class="legend">
+      <div><span>비용 영역 · 실현 가능성 (Feasibility)</span><span class="sw" style="background:#fbe9a0;"></span></div>
+      <div><span>매출 영역 · 수용 가능성 (Desirability)</span><span class="sw" style="background:#f7c9bd;"></span></div>
+      <div><span>수익 영역 · 생존 가능성 (Viability)</span><span class="sw" style="background:#c9e8cf;"></span></div>
+    </div>
+  </div>
+
+  <div class="canvas-wrap">
+    <div class="top-region">
+
+      <div class="card partners">
+        <h2><span class="num">8</span>핵심 파트너십</h2>
+        <ul>
+          <li>기상청·국가기상위성센터(데이터 제공)</li>
+          <li>변호사·법무사(법적자문)·보험사(재해보험 연계)</li>
+          <li>기상산업협회·한국기상전문인협회</li>
+          <li>환경부·지자체(정책정보)</li>
+          <li>이지태스크(플랫폼 파트너)</li>
+          <li>협회 네트워크 기반 검증된 전문 인력 풀 구성</li>
+        </ul>
+      </div>
+
+      <div class="card activities">
+        <h2><span class="num">7</span>핵심 활동</h2>
+        <ul>
+          <li>기상 빅데이터 수집·분석</li>
+          <li>기상감정보고서 작성</li>
+          <li>인허가·보조금 신청서류 대리제출</li>
+          <li>ESG·기후리스크 공시자료 작성</li>
+          <li>정기 콘텐츠 발행·교육 운영</li>
+          <li>제출 전 교차검증·법적 정합성 확인</li>
+        </ul>
+      </div>
+
+      <div class="card resources">
+        <h2><span class="num">6</span>핵심 자원</h2>
+        <ul>
+          <li>기상데이터 분석 전문 인력(본인)</li>
+          <li>행정서류 작성 보조 인력</li>
+          <li>기상청 공식 데이터 접근 권한</li>
+          <li>빅데이터 시각화·기후 시나리오 분석 도구</li>
+          <li>네이버 블로그·지식인 자체 계정</li>
+          <li>30년 경력 기반 해석 노하우(진입장벽형 자원)</li>
+        </ul>
+      </div>
+
+      <div class="card value-prop">
+        <h2><span class="num">2</span>가치 제안</h2>
+        <ul>
+          <li>기상감정·행정대리 원스톱 처리(전문가 1인)</li>
+          <li>기상산업진흥법 기반 신속 인허가 + TCFD·ISSB ESG공시 지원</li>
+          <li>30년 기상청 경력 해석력 + 행정사 자격 결합</li>
+          <li>빅데이터 시각화·RCP/SSP 기후 시나리오 분석 역량</li>
+          <li>컨설팅펌(행정대리 불가) · 행정사(기상전문성 없음) 대비 유일한 조합</li>
+        </ul>
+      </div>
+
+      <div class="card relations">
+        <h2><span class="num">4</span>고객 관계</h2>
+        <ul>
+          <li>무료 초기 상담·날씨경영리포트로 첫 접점 형성</li>
+          <li>1:1 전문 자문(사안별 상담·감정)</li>
+          <li>리테이너 고객 정기 모니터링 리포트 제공</li>
+          <li>블로그·뉴스레터 통한 커뮤니티형 관계 유지</li>
+          <li>건별 만족고객→ESG·보조금 모니터링 연계</li>
+          <li>담당자 직접 응대 원칙(법적·보험 사안 신뢰 구축)</li>
+        </ul>
+      </div>
+
+      <div class="card channels">
+        <h2><span class="num">3</span>채널</h2>
+        <ul>
+          <li>이지태스크 플랫폼 입점</li>
+          <li>네이버 블로그·지식인 콘텐츠 노출</li>
+          <li>유튜브·숏폼 사례 기반 콘텐츠</li>
+          <li>기상감정사·행정사협회 네트워크 소개</li>
+          <li>신청경로: 플랫폼 신청서·블로그상담·카톡 오픈채팅</li>
+          <li>건별=플랫폼 경로, 지속형=별도 상담 경로로 이원화</li>
+        </ul>
+      </div>
+
+      <div class="card segments">
+        <h2><span class="num">1</span>고객 세그먼트</h2>
+        <ul>
+          <li>기상재해 감정서 필요 농어업인·소상공인·중소기업</li>
+          <li>예비 기상사업자(신규 인허가 준비)</li>
+          <li>ESG·기후공시 대응 상장·중견기업</li>
+          <li>보조금·재해지원 신청 지자체·기관</li>
+          <li>법원·보험사 제출용 기상감정 수요자</li>
+          <li>유형: 인허가형·감정형·ESG형·교육구독형</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="bottom-region">
+      <div class="card">
+        <h2><span class="num">9</span>비용 구조</h2>
+        <ul>
+          <li>기상데이터 구독료(고정비)</li>
+          <li>플랫폼 이용수수료·사무소 운영비(고정비)</li>
+          <li>외부전문가 협업비(변동비)</li>
+          <li>콘텐츠 제작비·마케팅비(변동비)</li>
+          <li>저자본 구조 — 데이터·자격·네트워크 등 무형자산 투자 비중 높음</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2><span class="num">5</span>수익원</h2>
+        <ul>
+          <li>건별과금: 감정서 30~100만·인허가대리 20~50만</li>
+          <li>월정액 리테이너: ESG·보조금모니터링 50~150만</li>
+          <li>강의료: 회당 30~80만</li>
+          <li>플랫폼 채널수수료: 거래액 10~15%</li>
+          <li>콘텐츠 부가수익(전자책·광고), Basic·Standard·Premium 3단계</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">기상·기후 행정 전문 채널 — BMC 공통 질의서 답변 기반 작성 (담당자: 김영신)</div>
+
+</div>
+</body>
+</html>
