@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>부동산채널 BMC 9블록</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 20px;
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    background: #fff;
+  }
+  .sheet { width: 1160px; margin: 0 auto; }
+
+  .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 10px; }
+  .header h1 { font-size: 22px; margin: 0 0 2px 0; color:#1a1a1a; }
+  .header .sub { font-size: 12px; color:#555; }
+
+  .legend { text-align:right; font-size: 11px; }
+  .legend div { display:flex; align-items:center; justify-content:flex-end; gap:6px; margin-bottom:3px; }
+  .legend .sw { width:14px; height:14px; border-radius:2px; display:inline-block; }
+
+  .canvas-wrap { position: relative; width: 100%; }
+
+  .top-region {
+    position: relative;
+    display:grid;
+    grid-template-columns: 1fr 1fr 2fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 8px;
+    height: 430px;
+    padding: 10px;
+    border-radius: 10px;
+    overflow:hidden;
+  }
+  .top-region::before {
+    content:"";
+    position:absolute; left:0; top:0; width:50%; height:100%;
+    background:#fbe9a0; z-index:0;
+  }
+  .top-region::after {
+    content:"";
+    position:absolute; right:0; top:0; width:50%; height:100%;
+    background:#f7c9bd; z-index:0;
+  }
+
+  .card {
+    position:relative; z-index:1;
+    background: transparent;
+    border: 2px solid;
+    border-radius: 8px;
+    padding: 10px 12px;
+    display:flex; flex-direction:column;
+    overflow:hidden;
+  }
+  .card h2 {
+    margin: 0 0 8px 0;
+    font-size: 15px;
+    font-weight:700;
+    display:flex; align-items:center; gap:6px;
+  }
+  .card h2 .num {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:18px; height:18px; border-radius:4px;
+    color:#fff; font-size:11px; font-weight:700;
+  }
+  .card ul { margin:0; padding-left: 16px; flex:1; }
+  .card ul li { font-size: 14px; line-height: 1.55; margin-bottom: 2px; }
+
+  /* cost/gold family */
+  .partners, .activities, .resources { border-color:#c9971f; }
+  .partners h2, .activities h2, .resources h2 { color:#8a6408; }
+  .partners .num, .activities .num, .resources .num { background:#c9971f; }
+
+  /* revenue/salmon family */
+  .relations, .channels, .segments { border-color:#c0453a; }
+  .relations h2, .channels h2, .segments h2 { color:#8f2c24; }
+  .relations .num, .channels .num, .segments .num { background:#c0453a; }
+
+  .partners { grid-column:1; grid-row:1/3; }
+  .activities { grid-column:2; grid-row:1; }
+  .resources { grid-column:2; grid-row:2; }
+  .segments { grid-column:5; grid-row:1/3; }
+  .relations { grid-column:4; grid-row:1; }
+  .channels { grid-column:4; grid-row:2; }
+
+  .value-prop {
+    grid-column:3; grid-row:1/3;
+    border: 2px solid #1f3a6e;
+    position:relative;
+  }
+  .value-prop h2 { color:#1f3a6e; }
+  .value-prop .num { background:#1f3a6e; }
+  .value-prop::before {
+    content:"";
+    position:absolute; left:50%; top:8px; bottom:8px; width:1.5px;
+    background:#1f3a6e; opacity:0.55;
+  }
+
+  .bottom-region {
+    position: relative;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    height: 190px;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    background:#c9e8cf;
+  }
+  .bottom-region .card { border-color:#2f8a4c; }
+  .bottom-region .card h2 { color:#1f6636; }
+  .bottom-region .card .num { background:#2f8a4c; }
+  .bottom-region .card ul li { font-size: 16px; line-height: 1.6; }
+  .bottom-region .card h2 { font-size: 17px; }
+
+  .footer { margin-top: 8px; font-size: 10px; color:#888; }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="header">
+    <div>
+      <h1>부동산채널 &quot;브랜딩 컨설팅&quot; — 비즈니스 모델 캔버스</h1>
+      <div class="sub">Business Model Canvas · 9 Block · 담당자: 이형돈</div>
+    </div>
+    <div class="legend">
+      <div><span>비용 영역 · 실현 가능성 (Feasibility)</span><span class="sw" style="background:#fbe9a0;"></span></div>
+      <div><span>매출 영역 · 수용 가능성 (Desirability)</span><span class="sw" style="background:#f7c9bd;"></span></div>
+      <div><span>수익 영역 · 생존 가능성 (Viability)</span><span class="sw" style="background:#c9e8cf;"></span></div>
+    </div>
+  </div>
+
+  <div class="canvas-wrap">
+    <div class="top-region">
+
+      <div class="card partners">
+        <h2><span class="num">8</span>핵심 파트너십</h2>
+        <ul>
+          <li>공인중개사·세무사·법무사 등 자문 협력망</li>
+          <li>개업공인중개사 풀(테스트·초기 검증 대상)</li>
+          <li>1인 체제로 시작, 협력망 순차 구축 예정</li>
+        </ul>
+      </div>
+
+      <div class="card activities">
+        <h2><span class="num">7</span>핵심 활동</h2>
+        <ul>
+          <li>부동산 자료 조사 및 리스트업</li>
+          <li>필요시 전문가(세무사·법무사 등) 자문 확보</li>
+          <li>블로그·인스타그램 콘텐츠 제작·업로드</li>
+        </ul>
+      </div>
+
+      <div class="card resources">
+        <h2><span class="num">6</span>핵심 자원</h2>
+        <ul>
+          <li>블로그·인스타그램 자체 채널(플랫폼)</li>
+          <li>자료 검증·콘텐츠 제작 역량(영상편집 포함)</li>
+          <li>6년 중개업 경력 기반 콘텐츠 노하우</li>
+        </ul>
+      </div>
+
+      <div class="card value-prop">
+        <h2><span class="num">2</span>가치 제안</h2>
+        <ul>
+          <li>방대한 부동산 자료 수집·정리 대행</li>
+          <li>6년 중개업 경력 기반 콘텐츠 큐레이션</li>
+          <li>예시 블로그 시현으로 즉시 체감 가능</li>
+          <li>일반 블로그 대행사 대비 전문 자료 차별화</li>
+        </ul>
+      </div>
+
+      <div class="card relations">
+        <h2><span class="num">4</span>고객 관계</h2>
+        <ul>
+          <li>PM 전담 상담 또는 대면 상담</li>
+          <li>카테고리별 선택형 예시 준비·시현</li>
+        </ul>
+      </div>
+
+      <div class="card channels">
+        <h2><span class="num">3</span>채널</h2>
+        <ul>
+          <li>인스타그램·블로그 홍보</li>
+          <li>개업공인중개사 사무실 직접 방문 홍보</li>
+          <li>인스타그램·카카오DM 문의 접수</li>
+        </ul>
+      </div>
+
+      <div class="card segments">
+        <h2><span class="num">1</span>고객 세그먼트</h2>
+        <ul>
+          <li>1~2인 소형 중개사무소·신규 개업공인중개사</li>
+          <li>30~40대: SNS·블로그 활용층</li>
+          <li>50~60대: 디지털 활용 저조층</li>
+          <li>Outbound 부동산중개시장 개척 대상</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="bottom-region">
+      <div class="card">
+        <h2><span class="num">9</span>비용 구조</h2>
+        <ul>
+          <li>인건비</li>
+          <li>마케팅비</li>
+          <li>고정비·변동비 구분은 추후 확정 예정</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2><span class="num">5</span>수익원</h2>
+        <ul>
+          <li>월단위 건별 과금</li>
+          <li>월 40~50만원대(2개월 지원 패키지)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">부동산 브랜딩 컨설팅 채널 — BMC 공통 질의서 답변 기반 작성 (담당자: 이형돈)</div>
+
+</div>
+</body>
+</html>
